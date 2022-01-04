@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import com.Twitter.demo.Helpers.ParseJson;
 import com.Twitter.demo.Models.Tweet;
 import com.Twitter.demo.Models.TwitterProfile;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -33,7 +34,7 @@ public class TwitterApi {
     /*
      * This method calls the v2 Users endpoint with usernames as query parameter
      * */
-    public static TwitterProfile getUserProfile(String username) throws IOException, URISyntaxException {
+    public static TwitterProfile getUserProfile(String username) throws IOException, URISyntaxException,JsonSyntaxException {
         URIBuilder uriBuilder = new URIBuilder(String.format("https://api.twitter.com/2/users/by/username/%s", username));
         ArrayList<NameValuePair> queryParameters;
         queryParameters = new ArrayList<>();
@@ -49,11 +50,17 @@ public class TwitterApi {
         if(response.getStatusLine().getStatusCode() !=200) {
         	return null;
         }
+        //////////
+        
 
         if (entity != null) {
             String jsonResponse = EntityUtils.toString(entity, "UTF-8");
 
-            return ParseJson.profile(jsonResponse);
+          try {
+        	  return ParseJson.profile(jsonResponse);
+          }catch (JsonSyntaxException error) {
+        	  return null;
+          }
         }
 
         return null;
